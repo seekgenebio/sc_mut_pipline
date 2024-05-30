@@ -3,7 +3,7 @@
 SeekOne FAST break the limitations of the conventional 3 'or 5' end transcriptome, and use random primers for random capture and detection of the full transcriptome, resulting in more abundant transcriptome information in the sequencing data. Therefore, the use of full sequence data for variation analysis of single-cell transcriptome data has become a new analysis content. At the same time, for some samples (such as tumor samples), insufficient depth of full sequence data may result in missing detection of some loci. In order to improve the accuracy of gene detection, the corresponding panel enrichment of the full sequence library can be carried out.
 In view of the FAST sequence or data variation analysis, after the enrichment of this document reference souporcell software (https://github.com/wheaton5/souporcell) to construct the following pipline.
 
-![图片.png](attachment:88965d55-4f99-4c42-bb2a-55ebcaa4104a.png)
+![图片](src/pipline.png)
 
 ### requirements
 
@@ -74,13 +74,15 @@ samtools index hisat.tagged_sorted.bam
 ```
 
 ```
-输出说明：starAligned.out.bam 是STAR软件直接比对输出的bam 
-        sort.star.bam  是对STAR输出bam按照染色体位置进行排序后的bam
-        star.tagged_sorted.bam 是在bam中增加barcode和UMI信息，tag中的“CB” “UB”分别表示barcode和UMI序列
-        star.tagged_sorted.bam.bai 索引文件
-        hisat.bam 是hisat2软件进行比对并按照染色体位置排序后的bam
-        hisat.tagged_sorted.bam 在hisat比对完的bam中增加了barcode和UMI信息的bam
-        hisat.tagged_sorted.bam.bai 索引文件
+Output descriptions：
+    starAligned.out.bam is the bam file which directly aligned and output by STAR software
+    sort.star.bam  is the bam file after sorted according to chromosome position
+    star.tagged_sorted.bam is to add barcode and UMI information to bam, "CB" and "UB" in tag represent barcode and UMI sequence respectively
+    star.tagged_sorted.bam.bai index file
+        
+    hisat.bam is the bam file after hisat2 software aligns and sorts according to chromosome position
+    hisat.tagged_sorted.bam adds barcode and UMI information to the bam after hisat alignment
+    hisat.tagged_sorted.bam.bai index file
 ```
 
 #### 3、calling candidate variants by freebayes and normlize was performed by bcftools
@@ -99,10 +101,12 @@ bcftools norm -m +both -Ov -f ${ref}.fa hisat.freebayes.vcf > norm.hisat.freebay
 ```
 
 ```
-输出说明：star.freebayes.vcf 是STAR软件比对结果的变异信息文件
-        norm.star.freebayes.vcf 是对变异位点进行变异标准化后的vcf文件
-        hisat.freebayes.vcf 是hisat2软件比对结果的变异信息文件 
-        norm.hisat.freebayes.vcf 是对变异位点进行变异标准化后的vcf文件
+Output description: 
+    star.freebayes.vcf is a vcf file obtained by freebayes based on the bam file obtained by STAR software
+    norm.star.freebayes.vcf is the vcf file after the variation normalized
+    hisat.freebayes.vcf is a vcf file obtained by freebayes based on the bam file obtained by hisat2 software
+    norm.hisat.freebayes.vcf is the vcf file after the variation normalized
+
 ```
 
 #### 4、predicting the functional effects of genomic variants by VEP
@@ -120,10 +124,11 @@ vep -i norm.hisat.freebayes.vcf -o hisat.freebayes.vep.vcf --species homo_sapien
 ```
 
 ```
-输出说明：star.freebayes.vep.vcf 是STAR软件比对结果的变异信息注释结果文件
-        star.freebayes.vep.vcf_summary.html 是VEP软件注释结果统计信息
-        hisat.freebayes.vep.vcf 是hisat2软件比对结果的变异信息注释结果文件
-        hisat.freebayes.vep.vcf_summary.html 是VEP软件注释结果统计信息
+Output description: 
+    star.freebayes.vep.vcf is the variant information annotation result file of the STAR software alignment result
+    star.freebayes.vep.vcf_summary.html is the statistical information of the VEP software annotation result
+    hisat.freebayes.vep.vcf is the variant information annotation result file of the hisat2 software alignment result
+    hisat.freebayes.vep.vcf_summary.html is the statistical information of the VEP software annotation result
 ```
 
 #### 5、intersect and filter variants 
@@ -158,18 +163,20 @@ Rscipt snv_module_v2.R
 ```
 
 ```
-结果说明：sam_snv_markers.xls文件是位点在cluster中做的fisher检验
-         SNV：突变位点信息
-         p_val：fisher检验的p值
-         ident1_cover：目标cluster/celltype中有多少细胞覆盖到了这个突变位点但是没发生突变
-         ident1_mut：目标cluster/celltype中有多少细胞带有这个突变
-         ident2_cover: 非目标cluster/celltype中有多少细胞覆盖到了这个突变位点但是没发生突变
-         ident2_mut：非目标cluster/celltype中有多少细胞带有这个突变
-         cluster：目标细胞类型
+Result description: 
+sam_snv_markers.xls file is the Fisher test of the site in the cluster
+
+    SNV: mutation site information
+    p_val: p value of the Fisher test
+    ident1_cover: how many cells in the target cluster/celltype cover this mutation site but have not mutated
+    ident1_mut: how many cells in the target cluster/celltype carry this mutation
+    ident2_cover: how many cells in the non-target cluster/celltype cover this mutation site but have not mutated
+    ident2_mut: how many cells in the non-target cluster/celltype carry this mutation
+    cluster: target cell type
          
 ```
 
-![图片.png](attachment:15498b1b-8392-437e-a359-a0a9405e024c.png)
+![图片.png](src/plot.jpg)
 
 ```
 Top left: Each dot represents a cell, and the colored dot represents the sequence of that cell covering the mutation site.
@@ -186,12 +193,12 @@ The rds file  adds mutation and coverage information on the basis of expressing 
 
 For RNA sequence, the comparison software would be at the end of reads or the comparison of splice would be poor, and different software would cause different false positives, so two comparison software were used and their mutation results were intersected. Referring to souprocell software, minimap and hisat, minimap is not suitable for double-ended comparison of short reads, so it is replaced by the STAR software most commonly used in single-cell RNA data.（PMID: 32366989， 28680106 ）
 
-#### 2、检出位点情况说明
+#### 2. Description of the detected sites
 
 
-利用我们的混合细胞系数据进行测试发现： 对于两个已知的位点：chr12:25245351-25245351（G12S）chr7:55174772-55174772(exon19:c.2236_2250del)，对于G12S这个snp位点可以正常检测到，对于后者indel位点，最终结果中不存在，其原因是hisat比对得到的bam中不存在该位点的deletion。
+Base on  mixed cell line data, we found that: For two known sites: chr12:25245351-25245351 (G12S) chr7:55174772-55174772 (exon19:c.2236_2250del), the G12S SNP site can be detected normally, but the latter indel site does not exist in the final result. The reason is that the deletion of this site does not exist in the bam obtained by hisat comparison.
 
-我们对比6个样本的seekoneFAST数据和WES数据：
+We compare the seekoneFAST data and WES data of 6 samples:
 
 | WES | ovelap |scFAST |
 | :---: | :---: | :---: |
@@ -203,7 +210,7 @@ For RNA sequence, the comparison software would be at the end of reads or the co
 |76|7（4.828%）|62|
 
 
-scFAST特有的位点，在WES的bam中可以看到位点覆盖度不高，可能是因为突变丰度较低，WES深度不够，也可能位点是是在转录层面的突变；
+For sites unique to scFAST, the coverage of the sites in the WES bam is not high. This may be due to the low abundance of mutations, insufficient depth of WES, or mutations at the transcriptional level.
 |summary|value|
 |:---: | :---: |
 |Min.  :|8|
@@ -213,7 +220,7 @@ scFAST特有的位点，在WES的bam中可以看到位点覆盖度不高，可�
 |3rd Qu.:|80|
 |Max.   :|194|
 
-WES特有的位点在scFAST数据中可看到，一些存在链偏好性（SOR>3），一些不存在突变或alt reads极少，该类型位点在WES数据中vaf也不太高。
+WES-specific sites can be seen in the scFAST data, some of which have chain preferences (SOR>3), some of which have no mutations or very few alt reads, and the vaf of this type of site in the WES data is not too high.
 |summary|value|
 |:---: | :---: |
 |Min.  :|0.03200|
@@ -223,12 +230,10 @@ WES特有的位点在scFAST数据中可看到，一些存在链偏好性（SOR>3
 |3rd Qu.:|0.40228|
 |Max.   :|0.65395|
 
-本文档旨在提供一个scFAST检测变异的思路及参考示例，然而因为数据多样性，最终得到的结果可能会存在某些假阳性或者假阴性，可根据自己数据及结果对软件参数或者过滤条件进行调整。
+This document aims to provide an idea and reference example for scFAST variation detection. However, due to data diversity, the final results may contain some false positives or false negatives. You can adjust the software parameters or filtering conditions according to your own data and results.
 
-#### 3、关于输入文件
+#### 3. About input files
 
-构建索引时，需要分别构建STAR索引及hisat索引，请保持所用fasta文件为同一个。
+When building an index, you need to build a STAR index and a hisat index separately. Please keep the fasta file used the same.
 
-下载vep database时请下载indexed_vep_cache，并推荐采用ossline模式，这样会加快运行速度，且大大减少内存消耗。vep设置的参数请与下载的database一致。
-
-
+When downloading the vep database, please download indexed_vep_cache, and it is recommended to use the ossline mode, which will speed up the operation and greatly reduce memory consumption. The parameters set by vep should be consistent with the downloaded database.

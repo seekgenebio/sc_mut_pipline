@@ -62,13 +62,13 @@ def read_vcf(vcf):
                 posdic.update({(chr,pos,ref,alt): ""})
     return posdic, infolist, infoindex
 @click.command("filter vcf.")
-@click.option("--minimapvcf", help="vcf file obtained using minimap2")
+@click.option("--starvcf", help="vcf file obtained using star")
 @click.option("--hisatvcf", help="vcf file obtained using hisat2")
 @click.option("--finalvcf",  help="candidate variation sites")
-def final_vcf(minimapvcf, hisatvcf, finalvcf):
-    minipos,infolist, infoindex = read_vcf(minimapvcf)
+def final_vcf(starvcf, hisatvcf, finalvcf):
+    minipos,infolist, infoindex = read_vcf(starvcf)
     hisatpos,infolist, infoindex = read_vcf(hisatvcf)
-    with open(minimapvcf, 'r') as infile:
+    with open(starvcf, 'r') as infile:
         with open(finalvcf, 'w') as out:
          with open(finalvcf+'.txt', 'w') as outtxt:
            outtxt.write('\t'.join(["chr",'pos','ref']+infolist)+'\n')

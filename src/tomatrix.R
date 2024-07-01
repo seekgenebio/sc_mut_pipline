@@ -12,7 +12,7 @@ parser$add_argument("--refmatrix", required = TRUE,
 parser$add_argument("--altmatrix", required = TRUE,
                     help = "alt_matrix.mtx")
 parser$add_argument("--annofile", required = TRUE,
-                    help = "final annotation file ;eg: final.vcf.txt")
+                    help = "final annotation file ;eg: filter.vcf.txt")
 parser$add_argument("--barcode", required = TRUE,
                     help = "barcodes file ")
 parser$add_argument("--variants", required = TRUE,
@@ -24,8 +24,7 @@ Args <- parser$parse_args(args = commandArgs(trailingOnly = TRUE))
 inmatrix <- readMM(Args$altmatrix)
 inmatrix <- as.data.frame(as.matrix(inmatrix))
 barcodes <- read.table(Args$barcode, header = F)
-gene_file <- read.table(Args$annofile,header=T, sep="\t")
-head(gene_file)
+gene_file <- read.table(Args$annofile,header=T, sep="\t",row.names = NULL)
 gene <- gene_file[,"SYMBOL"]
 chr <- gene_file[,"chr"]
 pos <- gene_file[,"pos"]

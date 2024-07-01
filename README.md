@@ -26,7 +26,7 @@ vatrix: https://github.com/10XGenomics/vartrix
 The above software can be downloaded and installed separately or integrated into one environment through conda installation.
 
 ```
-ref="hisat_idx/hg38.hisat2.genome" （以human hg38为例）
+ref="hisat_idx/hg38.hisat2.genome" （eg.human hg38）
 star_index="star_index"
 fq1="fastq.R1.gz"
 fq2="fastq.R2.gz"
@@ -114,11 +114,10 @@ Output description:
 ```
 # star
 
-vep -i norm.star.freebayes.vcf -o star.freebayes.vep.vcf --species homo_sapiens --cache    --force --dir_cache $vepcache --sift b --polyphen b --ccds  --symbol --numbers --domains --regulatory --canonical --protein --biotype --af --af_1kg --max_af --pubmed --uniprot --mane --tsl --appris --variant_class --gene_phenotype --mirna  --merged  --exclude_predicted --tab --gencode_basic --per_gene --pick_allele --vcf
+vep -i norm.star.freebayes.vcf -o star.freebayes.vep.vcf --species homo_sapiens --force --dir_cache $vepcache --sift b  --ccds --symbol --numbers --domains --regulatory --canonical --protein  --biotype --af --af_1kg --max_af --pubmed --uniprot --mane --tsl --appris --variant_class --gene_phenotype --mirna  --merged  --exclude_predicted  --gencode_basic --per_gene  --pick_allele --vcf --offline --hgvs --fasta ${ref}.fa
 
 # hisat
-
-vep -i norm.hisat.freebayes.vcf -o hisat.freebayes.vep.vcf --species homo_sapiens --cache    --force --dir_cache $vepcache --sift b --polyphen b --ccds  --symbol --numbers --domains --regulatory --canonical --protein --biotype --af --af_1kg --max_af --pubmed --uniprot --mane --tsl --appris --variant_class --gene_phenotype --mirna  --merged  --exclude_predicted --tab --gencode_basic --per_gene --pick_allele --vcf
+vep -i norm.hisat.freebayes.vcf -o hisat.freebayes.vep.vcf --species homo_sapiens --force --dir_cache $vepcache --sift b  --ccds --symbol --numbers --domains --regulatory --canonical --protein  --biotype --af --af_1kg --max_af --pubmed --uniprot --mane --tsl --appris --variant_class --gene_phenotype --mirna  --merged  --exclude_predicted  --gencode_basic --per_gene  --pick_allele --vcf --offline --hgvs --fasta ${ref}.fa
 
 
 ```

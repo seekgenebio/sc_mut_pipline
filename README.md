@@ -66,7 +66,7 @@ seeksoultools utils addtag --inbam sort.star.bam  --outbam star.tagged_sorted.ba
 samtools index star.tagged_sorted.bam
 
 # hisat
-hisat2  -t 8 -1 $fq1 -2 $fq2 -x  $ref | samtools sort  -O BAM -o hisat.bam -
+hisat2  -p 8 -1 $fq1 -2 $fq2 -x  $ref | samtools sort  -O BAM -o hisat.bam -
 
 seeksoultools utils addtag --inbam hisat.bam  --outbam hisat.tagged_sorted.bam
 
@@ -197,37 +197,6 @@ For RNA sequence, the comparison software would be at the end of reads or the co
 
 Base on  mixed cell line data, we found that: For two known sites: chr12:25245351-25245351 (G12S) chr7:55174772-55174772 (exon19:c.2236_2250del), the G12S SNP site can be detected normally, but the latter indel site does not exist in the final result. The reason is that the deletion of this site does not exist in the bam obtained by hisat comparison.
 
-We compare the seekoneFAST data and WES data of 6 samples:
-
-| WES | ovelap |scFAST |
-| :---: | :---: | :---: |
-| 77 | 13（8.725%）| 59 |
-| 95 | 9 （5.389%）| 63 |
-|77|16（10.323%） |62
-|112|12（6.704%）|55|
-|68|15（11.194%）|51|
-|76|7（4.828%）|62|
-
-
-For sites unique to scFAST, the coverage of the sites in the WES bam is not high. This may be due to the low abundance of mutations, insufficient depth of WES, or mutations at the transcriptional level.
-|summary|value|
-|:---: | :---: |
-|Min.  :|8|
-|1st Qu.:|28|
-|Median :|45|
-| Mean   :|54.75|
-|3rd Qu.:|80|
-|Max.   :|194|
-
-WES-specific sites can be seen in the scFAST data, some of which have chain preferences (SOR>3), some of which have no mutations or very few alt reads, and the vaf of this type of site in the WES data is not too high.
-|summary|value|
-|:---: | :---: |
-|Min.  :|0.03200|
-|1st Qu.:|0.05412|
-|Median :|0.09375|
-| Mean   :|0.21360|
-|3rd Qu.:|0.40228|
-|Max.   :|0.65395|
 
 This document aims to provide an idea and reference example for scFAST variation detection. However, due to data diversity, the final results may contain some false positives or false negatives. You can adjust the software parameters or filtering conditions according to your own data and results.
 
